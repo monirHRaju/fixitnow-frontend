@@ -30,10 +30,10 @@ interface NavItem {
 }
 
 const customerNavItems: NavItem[] = [
-  { href: "/customer/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
-  { href: "/customer/bookings", label: "My Bookings", icon: <CalendarCheck className="h-4 w-4" /> },
-  { href: "/customer/payments", label: "Payments", icon: <CreditCard className="h-4 w-4" /> },
-  { href: "/customer/reviews", label: "My Reviews", icon: <Star className="h-4 w-4" /> },
+  { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
+  { href: "/bookings", label: "My Bookings", icon: <CalendarCheck className="h-4 w-4" /> },
+  { href: "/payments", label: "Payments", icon: <CreditCard className="h-4 w-4" /> },
+  { href: "/reviews", label: "My Reviews", icon: <Star className="h-4 w-4" /> },
   { href: "/profile", label: "Profile", icon: <Settings className="h-4 w-4" /> },
 ];
 
@@ -41,7 +41,7 @@ const technicianNavItems: NavItem[] = [
   { href: "/technician/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
   { href: "/technician/bookings", label: "Bookings", icon: <CalendarCheck className="h-4 w-4" /> },
   { href: "/technician/services", label: "My Services", icon: <Wrench className="h-4 w-4" /> },
-  { href: "/technician/schedule", label: "Schedule", icon: <Clock className="h-4 w-4" /> },
+  { href: "/technician/availability", label: "Schedule", icon: <Clock className="h-4 w-4" /> },
   { href: "/technician/reviews", label: "Reviews", icon: <Star className="h-4 w-4" /> },
   { href: "/profile", label: "Profile", icon: <Settings className="h-4 w-4" /> },
 ];

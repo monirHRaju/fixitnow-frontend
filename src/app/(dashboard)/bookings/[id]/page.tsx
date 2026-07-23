@@ -19,7 +19,7 @@ import {
   AlertCircle,
   Clock,
 } from "lucide-react";
-import { bookingApi, paymentApi } from "@/lib/api";
+import { bookingApi, paymentApi, reviewApi } from "@/lib/api";
 import type { Booking } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +32,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import {
   formatDate,
@@ -74,6 +84,10 @@ export default function BookingDetailPage({
   const [error, setError] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [paying, setPaying] = useState(false);
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchBooking = async () => {
@@ -146,6 +160,36 @@ export default function BookingDetailPage({
       );
     } finally {
       setPaying(false);
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    if (!booking || reviewRating === 0) return;
+    setReviewSubmitting(true);
+    try {
+      await reviewApi.create({
+        bookingId: booking.id,
+        rating: reviewRating,
+        comment: reviewComment.trim() || undefined,
+      });
+      toast.success("Review submitted successfully");
+      setReviewDialogOpen(false);
+      setReviewRating(0);
+      setReviewComment("");
+      const response = await bookingApi.getById(id);
+      setBooking(response.data?.booking ?? null);
+    } catch (err: unknown) {
+      const errorObj = err as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
+      toast.error(
+        errorObj?.response?.data?.message ||
+          errorObj?.message ||
+          "Failed to submit review"
+      );
+    } finally {
+      setReviewSubmitting(false);
     }
   };
 
@@ -416,11 +460,9 @@ export default function BookingDetailPage({
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button asChild>
-                  <Link href={`/reviews`}>
-                    <Star className="mr-2 h-4 w-4" />
-                    Write a Review
-                  </Link>
+                <Button onClick={() => setReviewDialogOpen(true)}>
+                  <Star className="mr-2 h-4 w-4" />
+                  Write a Review
                 </Button>
               </CardContent>
             </Card>
@@ -469,5 +511,81 @@ export default function BookingDetailPage({
         </motion.div>
       </div>
     </motion.div>
+
+      {/* Review Dialog */}
+      <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
+        <DialogContent>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.2 }}
+          >
+            <DialogHeader>
+              <DialogTitle>Write a Review</DialogTitle>
+              <DialogDescription>
+                Share your experience with this service
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              {/* Star Rating */}
+              <div className="space-y-2">
+                <Label>Rating</Label>
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setReviewRating(star)}
+                      className="transition-colors hover:text-yellow-500"
+                    >
+                      <Star
+                        className={`h-8 w-8 ${
+                          star <= reviewRating
+                            ? "fill-yellow-500 text-yellow-500"
+                            : "text-muted-foreground"
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {/* Comment */}
+              <div className="space-y-2">
+                <Label htmlFor="comment">Comment (optional)</Label>
+                <Textarea
+                  id="comment"
+                  placeholder="Tell us about your experience..."
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  rows={4}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setReviewDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                disabled={reviewRating === 0 || reviewSubmitting}
+                onClick={handleSubmitReview}
+              >
+                {reviewSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  "Submit Review"
+                )}
+              </Button>
+            </DialogFooter>
+          </motion.div>
+        </DialogContent>
+      </Dialog>
   );
 }

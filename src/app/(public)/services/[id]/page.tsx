@@ -77,15 +77,13 @@ export default function ServiceDetailPage() {
       try {
         const serviceId = params.id as string;
 
-        // Fetch all services and find the one matching the ID
-        const servRes = await serviceApi.list();
+        // Fetch the service directly by ID
+        const servRes = await serviceApi.getById(serviceId);
         if (!servRes.success) {
           throw new Error("Failed to load service");
         }
 
-        const foundService = servRes.data.services.find(
-          (s) => s.id === serviceId
-        );
+        const foundService = servRes.data.service;
 
         if (!foundService) {
           throw new Error("Service not found");

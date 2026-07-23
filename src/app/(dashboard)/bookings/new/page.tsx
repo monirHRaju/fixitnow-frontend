@@ -88,11 +88,8 @@ function NewBookingContent() {
         setError(null);
 
         if (serviceId) {
-          const allServices = await serviceApi.list();
-          const found = allServices.data?.services?.find(
-            (s: ServiceItem) => s.id === serviceId
-          );
-          if (found) setService(found);
+          const found = await serviceApi.getById(serviceId);
+          if (found.success && found.data?.service) setService(found.data.service);
         }
 
         if (technicianId) {

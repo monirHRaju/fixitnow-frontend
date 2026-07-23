@@ -20,6 +20,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 export default function AdminDashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -31,7 +32,7 @@ export default function AdminDashboardPage() {
         const res = await adminApi.dashboard();
         setData(res.data);
       } catch {
-        // silently handle
+        toast.error("Failed to load dashboard data");
       } finally {
         setLoading(false);
       }

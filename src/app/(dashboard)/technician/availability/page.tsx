@@ -6,6 +6,7 @@ import { Plus, Trash2, Save } from "lucide-react";
 import { technicianApi } from "@/lib/api";
 import type { AvailabilitySlot } from "@/lib/types";
 import { getDayName, DAYS } from "@/lib/utils";
+import { useAuthStore } from "@/lib/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,12 +31,26 @@ export default function TechnicianAvailabilityPage() {
 
   const fetchAvailability = useCallback(async () => {
     try {
-      const res = await technicianApi.getBookings();
-      // The API response doesn't have a direct availability endpoint
-      // We'll try via the bookings or use the profile
-      // For now, let's just initialize with empty slots
-      // The instructor mentioned technicianApi.updateAvailability exists
-      // We'll try to get availability from the user's profile
+      const userId = useAuthStore.getState().user?.technicianProfile?.id;
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
+      const res = await technicianApi.getById(userId);
+      const slots = res.data?.technician?.availability || [];
+      if (slots.length > 0) {
+        setAvailability((prev) =>
+          prev.map((day) => ({
+            ...day,
+            slots: slots
+              .filter((s: AvailabilitySlot) => s.dayOfWeek === day.dayOfWeek)
+              .map((s: AvailabilitySlot) => ({
+                startTime: s.startTime,
+                endTime: s.endTime,
+              })),
+          }))
+        );
+      }
     } catch {
       // silently handle
     } finally {

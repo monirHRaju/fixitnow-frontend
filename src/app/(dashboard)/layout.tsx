@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/lib/store";
 import Sidebar from "@/components/layout/Sidebar";
 import MobileNav from "@/components/layout/MobileNav";
@@ -14,17 +14,35 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, isLoading, initialize } = useAuthStore();
 
   useEffect(() => {
     initialize();
   }, [initialize]);
 
+  // Auth guard: redirect to login if not authenticated
   useEffect(() => {
     if (!isLoading && !user) {
       router.push("/login");
     }
   }, [isLoading, user, router]);
+
+  // Role-based redirect: if user is on wrong role section, redirect to their dashboard
+  const isAdminRoute = pathname.startsWith("/admin");
+  const isTechnicianRoute = pathname.startsWith("/technician");
+  const isCustomerRoute = pathname.startsWith("/dashboard") || pathname.startsWith("/bookings") || pathname.startsWith("/payments") || pathname.startsWith("/reviews") || pathname.startsWith("/profile");
+
+  useEffect(() => {
+    if (!user || isLoading) return;
+    if (isAdminRoute && user.role !== "ADMIN") {
+      router.push("/dashboard");
+    } else if (isTechnicianRoute && user.role !== "TECHNICIAN") {
+      router.push("/dashboard");
+    } else if (isCustomerRoute && !isAdminRoute && !isTechnicianRoute && user.role !== "CUSTOMER") {
+      router.push("/dashboard");
+    }
+  }, [isAdminRoute, isTechnicianRoute, isCustomerRoute, user, isLoading, router]);
 
   if (isLoading) {
     return (
@@ -40,20 +58,6 @@ export default function DashboardLayout({
 
   if (!user) {
     return null;
-  }
-
-  // Route guard: only CUSTOMER role allowed for /dashboard/* pages
-  if (user.role !== "CUSTOMER") {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-foreground">Access Denied</h2>
-          <p className="mt-2 text-muted-foreground">
-            This section is only available to customers.
-          </p>
-        </div>
-      </div>
-    );
   }
 
   return (
