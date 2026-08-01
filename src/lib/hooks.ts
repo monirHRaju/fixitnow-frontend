@@ -251,7 +251,42 @@ export function useCancelBooking() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => bookingApi.cancel(id).then((r) => r.data.booking),
-    onSuccess: () => {
+    onMutate: async (id: string) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: queryKeys.bookings.all() });
+
+      // Snapshot previous value
+      const previousQueries = queryClient.getQueriesData<{
+        bookings: Booking[];
+        pagination?: any;
+      }>({ queryKey: queryKeys.bookings.all() });
+
+      // Optimistically update the booking status to CANCELLED
+      queryClient.setQueriesData<{ bookings: Booking[]; pagination?: any }>(
+        { queryKey: queryKeys.bookings.all() },
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            bookings: old.bookings.map((b) =>
+              b.id === id ? { ...b, status: "CANCELLED" as const } : b
+            ),
+          };
+        }
+      );
+
+      return { previousQueries };
+    },
+    onError: (_err, _id, context) => {
+      // Rollback on error
+      if (context?.previousQueries) {
+        for (const [key, data] of context.previousQueries) {
+          queryClient.setQueryData(key, data);
+        }
+      }
+    },
+    onSettled: () => {
+      // Always refetch after error or success
       queryClient.invalidateQueries({ queryKey: queryKeys.bookings.all() });
     },
   });

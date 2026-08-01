@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -11,10 +11,9 @@ import {
   DollarSign,
   Star,
   Plus,
-  ArrowUpDown,
 } from "lucide-react";
-import { bookingApi, paymentApi } from "@/lib/api";
-import type { Booking, BookingStatus } from "@/lib/types";
+import { useBookings, useCancelBooking, useCreatePayment } from "@/lib/hooks";
+import type { BookingStatus } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -58,37 +57,14 @@ const itemVariants = {
 };
 
 export default function BookingsPage() {
-  const [allBookings, setAllBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("ALL");
-  const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [payingId, setPayingId] = useState<string | null>(null);
 
-  const fetchBookings = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await bookingApi.list();
-      setAllBookings(response.data?.bookings ?? []);
-    } catch (err: unknown) {
-      const errorObj = err as {
-        response?: { data?: { message?: string } };
-        message?: string;
-      };
-      setError(
-        errorObj?.response?.data?.message ||
-          errorObj?.message ||
-          "Failed to load bookings"
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const { data, isLoading, error, refetch } = useBookings();
+  const cancelMutation = useCancelBooking();
+  const payMutation = useCreatePayment();
 
-  useEffect(() => {
-    fetchBookings();
-  }, [fetchBookings]);
+  const allBookings = data?.bookings ?? [];
 
   const filteredBookings =
     activeTab === "ALL"
@@ -100,50 +76,50 @@ export default function BookingsPage() {
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 
-  const handleCancel = async (id: string) => {
-    setCancellingId(id);
-    try {
-      await bookingApi.cancel(id);
-      toast.success("Booking cancelled successfully");
-      fetchBookings();
-    } catch (err: unknown) {
-      const errorObj = err as {
-        response?: { data?: { message?: string } };
-        message?: string;
-      };
-      toast.error(
-        errorObj?.response?.data?.message ||
-          errorObj?.message ||
-          "Failed to cancel booking"
-      );
-    } finally {
-      setCancellingId(null);
-    }
+  const handleCancel = (id: string) => {
+    cancelMutation.mutate(id, {
+      onSuccess: () => {
+        toast.success("Booking cancelled successfully");
+      },
+      onError: (err: unknown) => {
+        const errorObj = err as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
+        toast.error(
+          errorObj?.response?.data?.message ||
+            errorObj?.message ||
+            "Failed to cancel booking"
+        );
+      },
+    });
   };
 
   const handlePayNow = async (bookingId: string) => {
     setPayingId(bookingId);
-    try {
-      const response = await paymentApi.create(bookingId);
-      if (response.data?.gatewayUrl) {
-        window.location.href = response.data.gatewayUrl;
-      } else {
-        toast.success("Payment initiated successfully");
-        fetchBookings();
-      }
-    } catch (err: unknown) {
-      const errorObj = err as {
-        response?: { data?: { message?: string } };
-        message?: string;
-      };
-      toast.error(
-        errorObj?.response?.data?.message ||
-          errorObj?.message ||
-          "Failed to initiate payment"
-      );
-    } finally {
-      setPayingId(null);
-    }
+    payMutation.mutate(bookingId, {
+      onSuccess: (result) => {
+        if (result.gatewayUrl) {
+          window.location.href = result.gatewayUrl;
+        } else {
+          toast.success("Payment initiated successfully");
+        }
+      },
+      onError: (err: unknown) => {
+        const errorObj = err as {
+          response?: { data?: { message?: string } };
+          message?: string;
+        };
+        toast.error(
+          errorObj?.response?.data?.message ||
+            errorObj?.message ||
+            "Failed to initiate payment"
+        );
+      },
+      onSettled: () => {
+        setPayingId(null);
+      },
+    });
   };
 
   const canCancel = (status: BookingStatus) =>
@@ -151,6 +127,9 @@ export default function BookingsPage() {
   const canPay = (status: BookingStatus) => status === "ACCEPTED";
   const canReview = (status: BookingStatus, paymentStatus?: string) =>
     status === "COMPLETED" && paymentStatus === "COMPLETED";
+
+  const isCancelling = (id: string) =>
+    cancelMutation.isPending && cancelMutation.variables === id;
 
   return (
     <motion.div
@@ -197,7 +176,7 @@ export default function BookingsPage() {
 
       {/* Bookings List */}
       <motion.div variants={itemVariants} className="space-y-4">
-        {loading ? (
+        {isLoading ? (
           Array.from({ length: 3 }).map((_, i) => (
             <Card key={i}>
               <CardContent className="p-6">
@@ -216,8 +195,10 @@ export default function BookingsPage() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <AlertCircle className="h-12 w-12 text-destructive" />
-              <p className="mt-4 text-sm text-muted-foreground">{error}</p>
-              <Button variant="outline" className="mt-4" onClick={fetchBookings}>
+              <p className="mt-4 text-sm text-muted-foreground">
+                {error.message}
+              </p>
+              <Button variant="outline" className="mt-4" onClick={() => refetch()}>
                 Try Again
               </Button>
             </CardContent>
@@ -316,10 +297,10 @@ export default function BookingsPage() {
                             <Button
                               size="sm"
                               variant="destructive"
-                              disabled={cancellingId === booking.id}
+                              disabled={isCancelling(booking.id)}
                               onClick={() => handleCancel(booking.id)}
                             >
-                              {cancellingId === booking.id ? (
+                              {isCancelling(booking.id) ? (
                                 <Loader2 className="h-3 w-3 animate-spin" />
                               ) : (
                                 <XCircle className="h-3 w-3" />

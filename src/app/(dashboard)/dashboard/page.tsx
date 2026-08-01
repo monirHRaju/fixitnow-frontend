@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   CalendarCheck,
@@ -10,11 +10,10 @@ import {
   ArrowRight,
   Star,
   Wrench,
-  Loader2,
   AlertCircle,
 } from "lucide-react";
 import { useAuthStore } from "@/lib/store";
-import { bookingApi } from "@/lib/api";
+import { useBookings } from "@/lib/hooks";
 import type { Booking } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -57,12 +56,21 @@ interface BookingCount {
   cancelled: number;
 }
 
+function computeCounts(bookings: Booking[]): BookingCount {
+  return {
+    total: bookings.length,
+    requested: bookings.filter((b) => b.status === "REQUESTED").length,
+    accepted: bookings.filter((b) => b.status === "ACCEPTED").length,
+    completed: bookings.filter((b) => b.status === "COMPLETED").length,
+    cancelled: bookings.filter((b) => b.status === "CANCELLED").length,
+  };
+}
+
 export default function CustomerDashboardPage() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, error } = useBookings({ limit: "10" });
+  const bookings = data?.bookings ?? [];
 
   // Role-based redirect: /dashboard is for CUSTOMER only
   useEffect(() => {
@@ -74,32 +82,7 @@ export default function CustomerDashboardPage() {
     }
   }, [user, router]);
 
-  useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const limit = "10";
-        const response = await bookingApi.list({ limit });
-        setBookings(response.data?.bookings ?? []);
-      } catch (err: unknown) {
-        const errorObj = err as { response?: { data?: { message?: string } }; message?: string };
-        setError(errorObj?.response?.data?.message || errorObj?.message || "Failed to load bookings");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBookings();
-  }, []);
-
-  // Compute counts
-  const counts: BookingCount = {
-    total: bookings.length,
-    requested: bookings.filter((b) => b.status === "REQUESTED").length,
-    accepted: bookings.filter((b) => b.status === "ACCEPTED").length,
-    completed: bookings.filter((b) => b.status === "COMPLETED").length,
-    cancelled: bookings.filter((b) => b.status === "CANCELLED").length,
-  };
+  const counts = computeCounts(bookings);
 
   const recentBookings = [...bookings]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -151,7 +134,7 @@ export default function CustomerDashboardPage() {
         variants={itemVariants}
         className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
       >
-        {loading ? (
+        {isLoading ? (
           <>
             {Array.from({ length: 4 }).map((_, i) => (
               <Card key={i}>
@@ -230,7 +213,7 @@ export default function CustomerDashboardPage() {
               </Button>
             </CardHeader>
             <CardContent>
-              {loading ? (
+              {isLoading ? (
                 <div className="space-y-3">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <Skeleton key={i} className="h-20 w-full" />
@@ -239,7 +222,7 @@ export default function CustomerDashboardPage() {
               ) : error ? (
                 <div className="flex items-center justify-center py-8 text-muted-foreground">
                   <AlertCircle className="mr-2 h-5 w-5 text-destructive" />
-                  <p className="text-sm">{error}</p>
+                  <p className="text-sm">{error.message}</p>
                 </div>
               ) : recentBookings.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-center">
