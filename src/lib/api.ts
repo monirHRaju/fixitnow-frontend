@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ApiError } from "./errors";
 import type {
   ApiResponse,
   AuthData,
@@ -37,14 +38,20 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401 && typeof window !== "undefined") {
+    const apiError = ApiError.fromAxiosError(err);
+
+    if (apiError.isUnauthorized && typeof window !== "undefined") {
       localStorage.removeItem("fixitnow_token");
       localStorage.removeItem("fixitnow_user");
-      if (!window.location.pathname.startsWith("/login") && !window.location.pathname.startsWith("/register")) {
+      if (
+        !window.location.pathname.startsWith("/login") &&
+        !window.location.pathname.startsWith("/register")
+      ) {
         window.location.href = "/login";
       }
     }
-    return Promise.reject(err);
+
+    return Promise.reject(apiError);
   }
 );
 
