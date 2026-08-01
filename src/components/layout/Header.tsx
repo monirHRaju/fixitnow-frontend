@@ -53,7 +53,7 @@ export default function Header() {
       case "TECHNICIAN":
         return "/technician/dashboard";
       case "CUSTOMER":
-        return "/customer/dashboard";
+        return "/dashboard";
       default:
         return "/login";
     }

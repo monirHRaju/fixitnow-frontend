@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   CalendarCheck,
@@ -57,10 +58,21 @@ interface BookingCount {
 }
 
 export default function CustomerDashboardPage() {
+  const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Role-based redirect: /dashboard is for CUSTOMER only
+  useEffect(() => {
+    if (!user) return;
+    if (user.role === "ADMIN") {
+      router.replace("/admin/dashboard");
+    } else if (user.role === "TECHNICIAN") {
+      router.replace("/technician/dashboard");
+    }
+  }, [user, router]);
 
   useEffect(() => {
     const fetchBookings = async () => {
