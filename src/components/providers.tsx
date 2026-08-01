@@ -1,8 +1,25 @@
 "use client";
 
 import { useEffect, useState, createContext, useContext, useCallback } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "sonner";
 import { useAuthStore } from "@/lib/store";
+
+// ─── Query Client ─────────────────────────────────────────────────────────────
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 2,
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      retry: 0,
+    },
+  },
+});
 
 // ─── Theme Context ────────────────────────────────────────────────────────────
 
@@ -101,16 +118,19 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   }, [initialize]);
 
   return (
-    <ThemeProviderInner>
-      {children}
-      <Toaster
-        richColors
-        closeButton
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-        }}
-      />
-    </ThemeProviderInner>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProviderInner>
+        {children}
+        <Toaster
+          richColors
+          closeButton
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+          }}
+        />
+      </ThemeProviderInner>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 }
