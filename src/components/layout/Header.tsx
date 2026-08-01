@@ -4,9 +4,10 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, User, LogOut, Settings } from "lucide-react";
+import { Menu, X, User, LogOut, Settings, Sun, Moon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/lib/store";
+import { useTheme } from "@/components/providers";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -17,6 +18,7 @@ const navLinks = [
 export default function Header() {
   const pathname = usePathname();
   const { user, token, logout, isLoading } = useAuthStore();
+  const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -82,6 +84,19 @@ export default function Header() {
             </Link>
           ))}
         </nav>
+
+        {/* Theme Toggle (Desktop) */}
+        <button
+          onClick={toggleTheme}
+          className="hidden rounded-lg p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground md:inline-flex"
+          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        >
+          {theme === "dark" ? (
+            <Sun className="h-5 w-5" />
+          ) : (
+            <Moon className="h-5 w-5" />
+          )}
+        </button>
 
         {/* Desktop Auth Section */}
         <div className="hidden items-center gap-3 md:flex">
@@ -203,6 +218,21 @@ export default function Header() {
                   {link.label}
                 </Link>
               ))}
+            </div>
+
+            {/* Mobile Theme Toggle */}
+            <div className="border-t border-border px-4 py-2">
+              <button
+                onClick={toggleTheme}
+                className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              >
+                {theme === "dark" ? (
+                  <Sun className="h-4 w-4" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
+                {theme === "dark" ? "Light Mode" : "Dark Mode"}
+              </button>
             </div>
 
             <div className="border-t border-border px-4 py-3">
