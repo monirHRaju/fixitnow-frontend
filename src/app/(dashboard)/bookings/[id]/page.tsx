@@ -258,189 +258,143 @@ export default function BookingDetailPage({
   }
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="space-y-6"
-    >
-      {/* Back Button */}
-      <motion.div variants={itemVariants}>
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/bookings">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Bookings
-          </Link>
-        </Button>
-      </motion.div>
-
-      {/* Header */}
+    <>
       <motion.div
-        variants={itemVariants}
-        className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="space-y-6"
       >
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            {booking.service?.title || "Service Booking"}
-          </h1>
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <Badge className={getStatusColor(booking.status)}>
-              {booking.status}
-            </Badge>
-            {booking.payment && (
-              <Badge className={getStatusColor(booking.payment.status)} variant="outline">
-                Payment: {booking.payment.status}
+        {/* Back Button */}
+        <motion.div variants={itemVariants}>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/bookings">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Bookings
+            </Link>
+          </Button>
+        </motion.div>
+
+        {/* Header */}
+        <motion.div
+          variants={itemVariants}
+          className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"
+        >
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+              {booking.service?.title || "Service Booking"}
+            </h1>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <Badge className={getStatusColor(booking.status)}>
+                {booking.status}
               </Badge>
+              {booking.payment && (
+                <Badge className={getStatusColor(booking.payment.status)} variant="outline">
+                  Payment: {booking.payment.status}
+                </Badge>
+              )}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {canPay && (
+              <Button disabled={paying} onClick={handlePayNow}>
+                {paying ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <DollarSign className="mr-2 h-4 w-4" />
+                )}
+                Pay Now
+              </Button>
+            )}
+            {canCancel && (
+              <Button
+                variant="destructive"
+                disabled={cancelling}
+                onClick={handleCancel}
+              >
+                {cancelling ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <XCircle className="mr-2 h-4 w-4" />
+                )}
+                Cancel Booking
+              </Button>
             )}
           </div>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {canPay && (
-            <Button disabled={paying} onClick={handlePayNow}>
-              {paying ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <DollarSign className="mr-2 h-4 w-4" />
-              )}
-              Pay Now
-            </Button>
-          )}
-          {canCancel && (
-            <Button
-              variant="destructive"
-              disabled={cancelling}
-              onClick={handleCancel}
-            >
-              {cancelling ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <XCircle className="mr-2 h-4 w-4" />
-              )}
-              Cancel Booking
-            </Button>
-          )}
-        </div>
-      </motion.div>
+        </motion.div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Main Info */}
-        <motion.div variants={itemVariants} className="space-y-6 lg:col-span-2">
-          {/* Service & Technician Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Service Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start gap-3">
-                <Wrench className="mt-0.5 h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">Service</p>
-                  <p className="text-sm text-muted-foreground">
-                    {booking.service?.title || "N/A"}
-                  </p>
-                  {booking.service?.description && (
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {booking.service.description}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Separator />
-              <div className="flex items-start gap-3">
-                <User className="mt-0.5 h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">Technician</p>
-                  <p className="text-sm text-muted-foreground">
-                    {booking.technician?.user?.name || "N/A"}
-                  </p>
-                  {booking.technician?.location && (
-                    <p className="text-sm text-muted-foreground">
-                      {booking.technician.location}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Separator />
-              <div className="flex items-start gap-3">
-                <Calendar className="mt-0.5 h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">Scheduled At</p>
-                  <p className="text-sm text-muted-foreground">
-                    {formatDateTime(booking.scheduledAt)}
-                  </p>
-                  {booking.service?.durationMins && (
-                    <p className="text-sm text-muted-foreground">
-                      Duration: ~{booking.service.durationMins} mins
-                    </p>
-                  )}
-                </div>
-              </div>
-              <Separator />
-              <div className="flex items-start gap-3">
-                <MapPin className="mt-0.5 h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">Address</p>
-                  <p className="text-sm text-muted-foreground">
-                    {booking.address || "N/A"}
-                  </p>
-                </div>
-              </div>
-              {booking.notes && (
-                <>
-                  <Separator />
-                  <div className="flex items-start gap-3">
-                    <FileText className="mt-0.5 h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="text-sm font-medium">Notes</p>
-                      <p className="text-sm text-muted-foreground">
-                        {booking.notes}
-                      </p>
-                    </div>
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Payment Section */}
-          {booking.payment && (
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Main Info */}
+          <motion.div variants={itemVariants} className="space-y-6 lg:col-span-2">
+            {/* Service & Technician Info */}
             <Card>
               <CardHeader>
-                <CardTitle>Payment</CardTitle>
+                <CardTitle>Service Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <DollarSign className="mt-0.5 h-5 w-5 text-muted-foreground" />
+                  <Wrench className="mt-0.5 h-5 w-5 text-muted-foreground" />
                   <div>
-                    <p className="text-sm font-medium">Amount</p>
-                    <p className="text-lg font-semibold text-primary">
-                      {formatCurrency(booking.payment.amount)}
+                    <p className="text-sm font-medium">Service</p>
+                    <p className="text-sm text-muted-foreground">
+                      {booking.service?.title || "N/A"}
+                    </p>
+                    {booking.service?.description && (
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {booking.service.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <Separator />
+                <div className="flex items-start gap-3">
+                  <User className="mt-0.5 h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Technician</p>
+                    <p className="text-sm text-muted-foreground">
+                      {booking.technician?.user?.name || "N/A"}
+                    </p>
+                    {booking.technician?.location && (
+                      <p className="text-sm text-muted-foreground">
+                        {booking.technician.location}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <Separator />
+                <div className="flex items-start gap-3">
+                  <Calendar className="mt-0.5 h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Scheduled At</p>
+                    <p className="text-sm text-muted-foreground">
+                      {formatDateTime(booking.scheduledAt)}
+                    </p>
+                    {booking.service?.durationMins && (
+                      <p className="text-sm text-muted-foreground">
+                        Duration: ~{booking.service.durationMins} mins
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <Separator />
+                <div className="flex items-start gap-3">
+                  <MapPin className="mt-0.5 h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Address</p>
+                    <p className="text-sm text-muted-foreground">
+                      {booking.address || "N/A"}
                     </p>
                   </div>
                 </div>
-                {booking.payment.method && (
-                  <>
-                    <Separator />
-                    <div className="flex items-start gap-3">
-                      <CreditCard className="mt-0.5 h-5 w-5 text-muted-foreground" />
-                      <div>
-                        <p className="text-sm font-medium">Payment Method</p>
-                        <p className="text-sm text-muted-foreground">
-                          {booking.payment.method}
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                )}
-                {booking.payment.transactionId && (
+                {booking.notes && (
                   <>
                     <Separator />
                     <div className="flex items-start gap-3">
                       <FileText className="mt-0.5 h-5 w-5 text-muted-foreground" />
                       <div>
-                        <p className="text-sm font-medium">Transaction ID</p>
+                        <p className="text-sm font-medium">Notes</p>
                         <p className="text-sm text-muted-foreground">
-                          {booking.payment.transactionId}
+                          {booking.notes}
                         </p>
                       </div>
                     </div>
@@ -448,69 +402,116 @@ export default function BookingDetailPage({
                 )}
               </CardContent>
             </Card>
-          )}
 
-          {/* Review Section */}
-          {isCompleted && (
+            {/* Payment Section */}
+            {booking.payment && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Payment</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <DollarSign className="mt-0.5 h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">Amount</p>
+                      <p className="text-lg font-semibold text-primary">
+                        {formatCurrency(booking.payment.amount)}
+                      </p>
+                    </div>
+                  </div>
+                  {booking.payment.method && (
+                    <>
+                      <Separator />
+                      <div className="flex items-start gap-3">
+                        <CreditCard className="mt-0.5 h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">Payment Method</p>
+                          <p className="text-sm text-muted-foreground">
+                            {booking.payment.method}
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  {booking.payment.transactionId && (
+                    <>
+                      <Separator />
+                      <div className="flex items-start gap-3">
+                        <FileText className="mt-0.5 h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm font-medium">Transaction ID</p>
+                          <p className="text-sm text-muted-foreground">
+                            {booking.payment.transactionId}
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Review Section */}
+            {isCompleted && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Leave a Review</CardTitle>
+                  <CardDescription>
+                    Share your experience with this service
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button onClick={() => setReviewDialogOpen(true)}>
+                    <Star className="mr-2 h-4 w-4" />
+                    Write a Review
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </motion.div>
+
+          {/* Timeline Sidebar */}
+          <motion.div variants={itemVariants} className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Leave a Review</CardTitle>
-                <CardDescription>
-                  Share your experience with this service
-                </CardDescription>
+                <CardTitle>Timeline</CardTitle>
               </CardHeader>
               <CardContent>
-                <Button onClick={() => setReviewDialogOpen(true)}>
-                  <Star className="mr-2 h-4 w-4" />
-                  Write a Review
-                </Button>
+                {timelineEvents.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    No timeline events yet.
+                  </p>
+                ) : (
+                  <div className="relative space-y-0">
+                    {timelineEvents.map((event, idx) => (
+                      <div key={idx} className="flex gap-3 pb-6 last:pb-0">
+                        <div className="flex flex-col items-center">
+                          <div
+                            className={`flex h-3 w-3 rounded-full border-2 ${
+                              idx === timelineEvents.length - 1
+                                ? "border-primary bg-primary"
+                                : "border-muted-foreground/30 bg-background"
+                            }`}
+                          />
+                          {idx < timelineEvents.length - 1 && (
+                            <div className="mt-1 h-full w-px bg-border" />
+                          )}
+                        </div>
+                        <div className="flex-1 pt-0.5">
+                          <p className="text-sm font-medium">{event.label}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatDateTime(event.date)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
-          )}
-        </motion.div>
-
-        {/* Timeline Sidebar */}
-        <motion.div variants={itemVariants} className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Timeline</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {timelineEvents.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  No timeline events yet.
-                </p>
-              ) : (
-                <div className="relative space-y-0">
-                  {timelineEvents.map((event, idx) => (
-                    <div key={idx} className="flex gap-3 pb-6 last:pb-0">
-                      <div className="flex flex-col items-center">
-                        <div
-                          className={`flex h-3 w-3 rounded-full border-2 ${
-                            idx === timelineEvents.length - 1
-                              ? "border-primary bg-primary"
-                              : "border-muted-foreground/30 bg-background"
-                          }`}
-                        />
-                        {idx < timelineEvents.length - 1 && (
-                          <div className="mt-1 h-full w-px bg-border" />
-                        )}
-                      </div>
-                      <div className="flex-1 pt-0.5">
-                        <p className="text-sm font-medium">{event.label}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatDateTime(event.date)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-    </motion.div>
+          </motion.div>
+        </div>
+      </motion.div>
 
       {/* Review Dialog */}
       <Dialog open={reviewDialogOpen} onOpenChange={setReviewDialogOpen}>
@@ -587,5 +588,6 @@ export default function BookingDetailPage({
           </motion.div>
         </DialogContent>
       </Dialog>
+    </>
   );
 }
