@@ -23,13 +23,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+import { BookingStatusBadge } from "@/components/booking/BookingStatusBadge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import {
-  formatDate,
   formatDateTime,
-  getStatusColor,
   formatCurrency,
 } from "@/lib/utils";
 
@@ -230,18 +228,12 @@ export default function BookingsPage() {
                           <h3 className="truncate text-base font-semibold">
                             {booking.service?.title || "Service"}
                           </h3>
-                          <Badge className={getStatusColor(booking.status)}>
-                            {booking.status}
-                          </Badge>
+                          <BookingStatusBadge status={booking.status} />
                           {booking.payment && (
-                            <Badge
-                              className={getStatusColor(
-                                booking.payment.status
-                              )}
-                              variant="outline"
-                            >
-                              {booking.payment.status}
-                            </Badge>
+                            <BookingStatusBadge
+                              status={booking.payment.status}
+                              className="border-transparent bg-transparent text-xs"
+                            />
                           )}
                         </div>
                         <p className="mt-1 text-sm text-muted-foreground">

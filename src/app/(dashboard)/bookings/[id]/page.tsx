@@ -29,7 +29,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { BookingStatusBadge } from "@/components/booking/BookingStatusBadge";
+import { BookingTimeline } from "@/components/booking/BookingTimeline";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -44,9 +45,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import {
-  formatDate,
   formatDateTime,
-  getStatusColor,
   formatCurrency,
 } from "@/lib/utils";
 
@@ -285,13 +284,12 @@ export default function BookingDetailPage({
               {booking.service?.title || "Service Booking"}
             </h1>
             <div className="mt-2 flex flex-wrap items-center gap-2">
-              <Badge className={getStatusColor(booking.status)}>
-                {booking.status}
-              </Badge>
+              <BookingStatusBadge status={booking.status} />
               {booking.payment && (
-                <Badge className={getStatusColor(booking.payment.status)} variant="outline">
-                  Payment: {booking.payment.status}
-                </Badge>
+                <BookingStatusBadge
+                  status={booking.payment.status}
+                  className="border-transparent bg-transparent text-xs"
+                />
               )}
             </div>
           </div>
@@ -475,38 +473,15 @@ export default function BookingDetailPage({
             <Card>
               <CardHeader>
                 <CardTitle>Timeline</CardTitle>
+                <CardDescription>
+                  Track the progress of your booking
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                {timelineEvents.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    No timeline events yet.
-                  </p>
-                ) : (
-                  <div className="relative space-y-0">
-                    {timelineEvents.map((event, idx) => (
-                      <div key={idx} className="flex gap-3 pb-6 last:pb-0">
-                        <div className="flex flex-col items-center">
-                          <div
-                            className={`flex h-3 w-3 rounded-full border-2 ${
-                              idx === timelineEvents.length - 1
-                                ? "border-primary bg-primary"
-                                : "border-muted-foreground/30 bg-background"
-                            }`}
-                          />
-                          {idx < timelineEvents.length - 1 && (
-                            <div className="mt-1 h-full w-px bg-border" />
-                          )}
-                        </div>
-                        <div className="flex-1 pt-0.5">
-                          <p className="text-sm font-medium">{event.label}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {formatDateTime(event.date)}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <BookingTimeline
+                  events={timelineEvents}
+                  currentStatus={booking.status}
+                />
               </CardContent>
             </Card>
           </motion.div>
