@@ -19,6 +19,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { bookingApi, serviceApi, technicianApi } from "@/lib/api";
 import type { ServiceItem, TechnicianDetail } from "@/lib/types";
+import { TimeSlotPicker } from "@/components/booking/TimeSlotPicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -71,6 +72,8 @@ function NewBookingContent() {
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<CreateBookingFormData>({
     resolver: zodResolver(createBookingSchema),
@@ -80,6 +83,8 @@ function NewBookingContent() {
       notes: "",
     },
   });
+
+  const scheduledAtValue = watch("scheduledAt");
 
   useEffect(() => {
     const loadDetails = async () => {
@@ -318,17 +323,27 @@ function NewBookingContent() {
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="scheduledAt">Scheduled Date & Time</Label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="scheduledAt"
-                    type="datetime-local"
-                    className="pl-10"
-                    disabled={isSubmitting}
-                    {...register("scheduledAt")}
+                <Label>Scheduled Date & Time</Label>
+                {technician ? (
+                  <TimeSlotPicker
+                    technicianId={technician.id}
+                    availability={technician.availability ?? []}
+                    durationMins={service?.durationMins ?? 60}
+                    value={scheduledAtValue}
+                    onChange={(iso) => setValue("scheduledAt", iso, { shouldValidate: true })}
                   />
-                </div>
+                ) : (
+                  <div className="relative">
+                    <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="scheduledAt"
+                      type="datetime-local"
+                      className="pl-10"
+                      disabled={isSubmitting}
+                      {...register("scheduledAt")}
+                    />
+                  </div>
+                )}
                 {errors.scheduledAt && (
                   <p className="text-xs text-destructive">
                     {errors.scheduledAt.message}

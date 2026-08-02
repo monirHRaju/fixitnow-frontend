@@ -101,6 +101,14 @@ export interface AvailabilitySlot {
   endTime: string;
 }
 
+// Day-level availability for the time-slot picker
+export interface DayAvailability {
+  date: string;
+  dayOfWeek: number;
+  slots: AvailabilitySlot[];
+  bookedTimes: string[];
+}
+
 // Category
 export interface Category {
   id: string;

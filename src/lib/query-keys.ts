@@ -27,6 +27,8 @@ export const queryKeys = {
     profile: () => ["technicians", "profile"] as const,
     availability: (userId?: string) =>
       ["technicians", "availability", userId] as const,
+    dayAvailability: (id: string, date: string) =>
+      ["technicians", "availability", "day", id, date] as const,
     bookings: (params?: Record<string, string>) =>
       ["technicians", "bookings", params] as const,
   },

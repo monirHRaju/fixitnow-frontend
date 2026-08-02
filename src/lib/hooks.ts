@@ -153,6 +153,15 @@ export function useTechnicianDetail(id: string) {
   });
 }
 
+export function useDayAvailability(id: string, date: string) {
+  return useQuery({
+    queryKey: queryKeys.technicians.dayAvailability(id, date),
+    queryFn: () =>
+      technicianApi.getAvailability(id, date).then((r) => r.data),
+    enabled: !!id && !!date,
+  });
+}
+
 export function useUpdateTechnicianProfile() {
   const queryClient = useQueryClient();
   return useMutation({

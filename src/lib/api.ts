@@ -6,6 +6,7 @@ import type {
   User,
   TechnicianListItem,
   TechnicianDetail,
+  DayAvailability,
   Category,
   ServiceItem,
   Booking,
@@ -94,6 +95,8 @@ export const technicianApi = {
     api.get<ApiResponse<{ technicians: TechnicianListItem[]; pagination?: any }>>("/technicians", { params }).then((r) => r.data),
   getById: (id: string) =>
     api.get<ApiResponse<{ technician: TechnicianDetail }>>(`/technicians/${id}`).then((r) => r.data),
+  getAvailability: (id: string, date: string) =>
+    api.get<ApiResponse<DayAvailability>>(`/technicians/${id}/availability`, { params: { date } }).then((r) => r.data),
   updateProfile: (data: { bio?: string; skills?: string[]; experience?: number; hourlyRate?: number; location?: string }) =>
     api.put<ApiResponse<{ technician: any }>>("/technician/profile", data).then((r) => r.data),
   updateAvailability: (slots: { dayOfWeek: number; startTime: string; endTime: string }[]) =>
