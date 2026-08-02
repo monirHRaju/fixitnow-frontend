@@ -84,8 +84,10 @@ export default function BookingDetailPage({
   const [cancelling, setCancelling] = useState(false);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [reviewRating, setReviewRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
   const [reviewComment, setReviewComment] = useState("");
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const COMMENT_MAX = 500;
 
   useEffect(() => {
     const fetchBooking = async () => {
@@ -138,14 +140,29 @@ export default function BookingDetailPage({
     if (!booking || reviewRating === 0) return;
     setReviewSubmitting(true);
     try {
-      await reviewApi.create({
+      const res = await reviewApi.create({
         bookingId: booking.id,
         rating: reviewRating,
         comment: reviewComment.trim() || undefined,
       });
-      toast.success("Review submitted successfully");
+      const newReview = res.data?.review;
+      toast.success("Review submitted successfully", {
+        action: newReview
+          ? {
+              label: "View Review",
+              onClick: () => {
+                if (booking.technician?.id) {
+                  router.push(`/technicians/${booking.technician.id}`);
+                } else {
+                  router.push("/reviews");
+                }
+              },
+            }
+          : undefined,
+      });
       setReviewDialogOpen(false);
       setReviewRating(0);
+      setHoverRating(0);
       setReviewComment("");
       const response = await bookingApi.getById(id);
       setBooking(response.data?.booking ?? null);
@@ -423,16 +440,43 @@ export default function BookingDetailPage({
             {isCompleted && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Leave a Review</CardTitle>
+                  <CardTitle>Your Review</CardTitle>
                   <CardDescription>
-                    Share your experience with this service
+                    {booking.review
+                      ? "You've already left a review for this booking"
+                      : "Share your experience with this service"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button onClick={() => setReviewDialogOpen(true)}>
-                    <Star className="mr-2 h-4 w-4" />
-                    Write a Review
-                  </Button>
+                  {booking.review ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`h-5 w-5 ${
+                              star <= booking.review!.rating
+                                ? "fill-yellow-500 text-yellow-500"
+                                : "text-muted-foreground"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      {booking.review.comment && (
+                        <p className="text-sm text-muted-foreground">
+                          {booking.review.comment}
+                        </p>
+                      )}
+                      <p className="text-xs text-muted-foreground">
+                        Submitted {formatDateTime(booking.review.createdAt)}
+                      </p>
+                    </div>
+                  ) : (
+                    <Button onClick={() => setReviewDialogOpen(true)}>
+                      <Star className="mr-2 h-4 w-4" />
+                      Leave a Review
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             )}
@@ -478,22 +522,36 @@ export default function BookingDetailPage({
                 <Label>Rating</Label>
                 <div className="flex items-center gap-1">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <button
+                    <motion.button
                       key={star}
                       type="button"
                       onClick={() => setReviewRating(star)}
-                      className="transition-colors hover:text-yellow-500"
+                      onMouseEnter={() => setHoverRating(star)}
+                      onMouseLeave={() => setHoverRating(0)}
+                      whileHover={{ scale: 1.2, rotate: -8 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                      className="transition-colors focus:outline-none"
+                      aria-label={`${star} star${star > 1 ? "s" : ""}`}
                     >
                       <Star
                         className={`h-8 w-8 ${
-                          star <= reviewRating
+                          star <= (hoverRating || reviewRating)
                             ? "fill-yellow-500 text-yellow-500"
                             : "text-muted-foreground"
                         }`}
                       />
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  {reviewRating > 0
+                    ? ["", "Poor", "Fair", "Good", "Very Good", "Excellent"][
+                        reviewRating
+                      ]
+                    : "Tap a star to rate"}
+                  {reviewRating > 0 ? ` (${reviewRating}/5)` : ""}
+                </p>
               </div>
               {/* Comment */}
               <div className="space-y-2">
@@ -502,9 +560,15 @@ export default function BookingDetailPage({
                   id="comment"
                   placeholder="Tell us about your experience..."
                   value={reviewComment}
-                  onChange={(e) => setReviewComment(e.target.value)}
+                  onChange={(e) =>
+                    setReviewComment(e.target.value.slice(0, COMMENT_MAX))
+                  }
                   rows={4}
+                  maxLength={COMMENT_MAX}
                 />
+                <p className="text-right text-xs text-muted-foreground">
+                  {reviewComment.length}/{COMMENT_MAX}
+                </p>
               </div>
             </div>
             <DialogFooter>

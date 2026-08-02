@@ -188,6 +188,12 @@ export interface Booking {
     transactionId?: string;
     paidAt?: string;
   };
+  review?: {
+    id: string;
+    rating: number;
+    comment?: string;
+    createdAt: string;
+  };
 }
 
 // Payment
