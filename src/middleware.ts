@@ -47,7 +47,7 @@ const roleAllowedPrefixes: Record<string, string[]> = {
 const dashboardByRole: Record<string, string> = {
   ADMIN: "/admin/dashboard",
   TECHNICIAN: "/technician/dashboard",
-  CUSTOMER: "/dashboard",
+  CUSTOMER: "/dashboard/customer",
 };
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
