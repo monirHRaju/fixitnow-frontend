@@ -20,6 +20,7 @@ import { categoryApi, serviceApi } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
 import type { Category, ServiceItem } from "@/lib/types";
 import ServiceFilters, { type FiltersState } from "@/components/services/ServiceFilters";
+import { ServiceImage } from "@/components/ui/ServiceImage";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -317,6 +318,15 @@ export default function ServicesPage() {
                 <motion.div key={service.id} variants={fadeInUp}>
                   <Link href={`/services/${service.id}`} className="group block">
                     <div className="rounded-xl border bg-card shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+                      {/* Service Image */}
+                      <div className="p-6 pb-0">
+                        <ServiceImage
+                          src={service.imageUrl}
+                          alt={service.title}
+                          fallbackLabel={service.title}
+                          className="h-40 w-full"
+                        />
+                      </div>
                       <div className="p-6">
                         {/* Category Badge */}
                         <Badge variant="secondary" className="mb-3">

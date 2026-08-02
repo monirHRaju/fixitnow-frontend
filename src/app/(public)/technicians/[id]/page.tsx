@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 import { technicianApi } from "@/lib/api";
 import { formatCurrency, formatDate, getDayName } from "@/lib/utils";
 import type { TechnicianDetail, Review } from "@/lib/types";
@@ -227,9 +228,12 @@ export default function TechnicianDetailPage() {
             className="rounded-xl border bg-card p-6 shadow-sm"
           >
             <div className="flex flex-col sm:flex-row items-start gap-5">
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-primary/10 text-3xl font-bold text-primary">
-                {technician.user.name.charAt(0).toUpperCase()}
-              </div>
+              <UserAvatar
+                src={technician.user.avatarUrl}
+                name={technician.user.name}
+                className="h-20 w-20 shrink-0 text-3xl"
+                fallbackClassName="text-3xl"
+              />
               <div className="flex-1 min-w-0">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div>
@@ -448,9 +452,12 @@ export default function TechnicianDetailPage() {
                       className="rounded-lg border bg-card p-4"
                     >
                       <div className="flex items-start gap-3">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                          {(review.user?.name || "A").charAt(0).toUpperCase()}
-                        </div>
+                        <UserAvatar
+                          src={review.user?.avatarUrl}
+                          name={review.user?.name}
+                          className="h-9 w-9 shrink-0 text-xs"
+                          fallbackClassName="text-xs"
+                        />
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                             <span className="text-sm font-medium text-foreground">

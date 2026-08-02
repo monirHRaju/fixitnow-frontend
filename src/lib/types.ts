@@ -128,6 +128,7 @@ export interface ServiceItem {
   price: number;
   durationMins?: number;
   isActive: boolean;
+  imageUrl?: string | null;
   createdAt: string;
   updatedAt: string;
   category: { id: string; name: string };

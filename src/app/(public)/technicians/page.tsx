@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 import {
   Select,
   SelectContent,
@@ -376,9 +377,12 @@ export default function TechniciansPage() {
                   <div className="rounded-xl border bg-card p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1">
                     {/* Avatar and Name */}
                     <div className="flex flex-col items-center text-center">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
-                        {tech.user.name.charAt(0).toUpperCase()}
-                      </div>
+                      <UserAvatar
+                        src={tech.user.avatarUrl}
+                        name={tech.user.name}
+                        className="h-16 w-16 text-2xl"
+                        fallbackClassName="text-2xl"
+                      />
                       <h3 className="mt-3 text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
                         {tech.user.name}
                       </h3>
@@ -444,9 +448,12 @@ export default function TechniciansPage() {
                   /* List Card */
                   <div className="rounded-xl border bg-card p-4 shadow-sm transition-all duration-300 hover:shadow-md">
                     <div className="flex items-start gap-4">
-                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xl font-bold text-primary">
-                        {tech.user.name.charAt(0).toUpperCase()}
-                      </div>
+                      <UserAvatar
+                        src={tech.user.avatarUrl}
+                        name={tech.user.name}
+                        className="h-14 w-14 shrink-0 text-xl"
+                        fallbackClassName="text-xl"
+                      />
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                           <div>

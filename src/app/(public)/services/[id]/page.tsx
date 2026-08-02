@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import { UserAvatar } from "@/components/ui/UserAvatar";
 import { serviceApi, technicianApi } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
 import { useAuthStore } from "@/lib/store";
@@ -230,9 +231,12 @@ export default function ServiceDetailPage() {
 
             <div className="mt-4 rounded-xl border bg-card p-6 shadow-sm">
               <div className="flex items-start gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xl font-bold text-primary">
-                  {service.technician.user.name.charAt(0).toUpperCase()}
-                </div>
+                <UserAvatar
+                  src={service.technician.user.avatarUrl}
+                  name={service.technician.user.name}
+                  className="h-14 w-14 shrink-0 text-xl"
+                  fallbackClassName="text-xl"
+                />
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <div>
