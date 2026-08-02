@@ -31,7 +31,7 @@ const publicRoutes = [
 ];
 
 /** Auth pages — redirect logged-in users to their dashboard. */
-const authRoutes = ["/login", "/register"];
+const authRoutes = ["login", "register"];
 
 /**
  * Which path prefixes are accessible by each role.
