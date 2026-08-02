@@ -78,14 +78,91 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Custom scrollbar */
+/* === Custom scrollbar (WebKit) === */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 10px;
+  height: 10px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--muted-foreground) 50%, transparent);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: background-color 0.2s ease;
+}
+::-webkit-scrollbar-thumb:hover {
   background: var(--muted-foreground);
-  border-radius: 3px;
+  background-clip: content-box;
+  border: 2px solid transparent;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--muted-foreground) 50%, transparent)
+    transparent;
+}
+
+/* === Smooth scrolling === */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* === Consistent focus ring === */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: calc(var(--radius-md) - 2px);
+}
+
+/* === Page transition (fade in on route change) === */
+.page-enter {
+  animation: pageFadeIn 0.35s ease-out both;
+}
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: none;
+  }
+}
+
+/* === Interactive hover/active refinements === */
+@media (hover: hover) {
+  a:hover,
+  button:hover {
+    transition: filter 0.15s ease;
+  }
+}
+
+button:not(:disabled):active,
+a:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled):active,
+  a:active {
+    transform: none;
+  }
 }

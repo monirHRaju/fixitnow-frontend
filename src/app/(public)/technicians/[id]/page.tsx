@@ -327,7 +327,7 @@ export default function TechnicianDetailPage() {
                 <Calendar className="h-5 w-5 text-primary" />
                 Availability Schedule
               </h2>
-              <div className="mt-4 overflow-hidden rounded-lg border">
+              <div className="mt-4 overflow-x-auto rounded-lg border">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-muted/50">
