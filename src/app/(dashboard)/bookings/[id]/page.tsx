@@ -19,7 +19,7 @@ import {
   AlertCircle,
   Clock,
 } from "lucide-react";
-import { bookingApi, paymentApi, reviewApi } from "@/lib/api";
+import { bookingApi, reviewApi } from "@/lib/api";
 import type { Booking } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import {
@@ -82,7 +82,6 @@ export default function BookingDetailPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
-  const [paying, setPaying] = useState(false);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState("");
@@ -132,33 +131,6 @@ export default function BookingDetailPage({
       );
     } finally {
       setCancelling(false);
-    }
-  };
-
-  const handlePayNow = async () => {
-    if (!booking) return;
-    setPaying(true);
-    try {
-      const response = await paymentApi.create(booking.id);
-      if (response.data?.gatewayUrl) {
-        window.location.href = response.data.gatewayUrl;
-      } else {
-        toast.success("Payment initiated");
-        const refresh = await bookingApi.getById(id);
-        setBooking(refresh.data?.booking ?? null);
-      }
-    } catch (err: unknown) {
-      const errorObj = err as {
-        response?: { data?: { message?: string } };
-        message?: string;
-      };
-      toast.error(
-        errorObj?.response?.data?.message ||
-          errorObj?.message ||
-          "Failed to initiate payment"
-      );
-    } finally {
-      setPaying(false);
     }
   };
 
@@ -295,12 +267,10 @@ export default function BookingDetailPage({
           </div>
           <div className="flex flex-wrap gap-2">
             {canPay && (
-              <Button disabled={paying} onClick={handlePayNow}>
-                {paying ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <DollarSign className="mr-2 h-4 w-4" />
-                )}
+              <Button
+                onClick={() => router.push(`/dashboard/customer/bookings/${booking.id}/pay`)}
+              >
+                <DollarSign className="mr-2 h-4 w-4" />
                 Pay Now
               </Button>
             )}
