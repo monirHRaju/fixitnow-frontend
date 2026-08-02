@@ -184,6 +184,7 @@ export interface Booking {
     status: string;
     amount: number;
     method?: string;
+    provider?: string;
     transactionId?: string;
     paidAt?: string;
   };

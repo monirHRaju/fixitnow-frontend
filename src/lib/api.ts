@@ -149,6 +149,14 @@ export const adminApi = {
     api.patch<ApiResponse<{ user: AdminUser }>>(`/admin/users/${id}`).then((r) => r.data),
   listBookings: (params?: Record<string, string>) =>
     api.get<ApiResponse<{ bookings: Booking[]; pagination: any }>>("/admin/bookings", { params }).then((r) => r.data),
+  getBookingById: (id: string) =>
+    api.get<ApiResponse<{ booking: Booking }>>(`/admin/bookings/${id}`).then((r) => r.data),
+  updateBookingStatus: (id: string, data: { status: string; reason?: string }) =>
+    api.patch<ApiResponse<{ booking: Booking }>>(`/admin/bookings/${id}/status`, data).then((r) => r.data),
+  overridePaymentStatus: (id: string, status: string) =>
+    api.patch<ApiResponse<{ payment: any }>>(`/admin/bookings/${id}/payment`, { status }).then((r) => r.data),
+  updateBookingNotes: (id: string, notes: string) =>
+    api.patch<ApiResponse<{ booking: Booking }>>(`/admin/bookings/${id}/notes`, { notes }).then((r) => r.data),
 };
 
 export default api;

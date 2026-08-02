@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download, Eye } from "lucide-react";
 import { adminApi } from "@/lib/api";
 import type { Booking } from "@/lib/types";
 import {
@@ -86,6 +87,54 @@ export default function AdminBookingsPage() {
     fetchBookings(page);
   }
 
+  function handleExport() {
+    if (bookings.length === 0) {
+      toast.info("No bookings to export");
+      return;
+    }
+    const headers = [
+      "ID",
+      "Customer",
+      "Customer Email",
+      "Technician",
+      "Service",
+      "Price",
+      "Status",
+      "Payment Status",
+      "Scheduled At",
+      "Address",
+    ];
+    const rows = bookings.map((b) => [
+      b.id,
+      b.customer?.name || "",
+      b.customer?.email || "",
+      b.technician?.user?.name || "",
+      b.service.title,
+      (b.service.price / 100).toFixed(2),
+      b.status,
+      b.payment?.status || "",
+      new Date(b.scheduledAt).toISOString(),
+      b.address,
+    ]);
+    const csv = [headers, ...rows]
+      .map((row) =>
+        row
+          .map((cell) => `"${String(cell).replace(/"/g, '""')}"`)
+          .join(",")
+      )
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `bookings-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${bookings.length} bookings`);
+  }
+
   return (
     <div className="space-y-6">
       <motion.div
@@ -99,7 +148,7 @@ export default function AdminBookingsPage() {
       </motion.div>
 
       {/* Filters */}
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-full sm:w-44">
             <SelectValue placeholder="All Status" />
@@ -112,6 +161,9 @@ export default function AdminBookingsPage() {
             ))}
           </SelectContent>
         </Select>
+        <Button variant="outline" className="gap-2 ml-auto" onClick={handleExport}>
+          <Download className="h-4 w-4" /> Export CSV
+        </Button>
       </div>
 
       {/* Bookings Table */}
@@ -152,6 +204,9 @@ export default function AdminBookingsPage() {
                     </th>
                     <th className="text-left font-medium text-muted-foreground py-3 px-4 hidden lg:table-cell">
                       Payment
+                    </th>
+                    <th className="text-right font-medium text-muted-foreground py-3 px-4">
+                      <span className="sr-only">Actions</span>
                     </th>
                   </tr>
                 </thead>
@@ -198,6 +253,14 @@ export default function AdminBookingsPage() {
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <Link
+                          href={`/admin/bookings/${booking.id}`}
+                          className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
+                        >
+                          <Eye className="h-3.5 w-3.5" /> View
+                        </Link>
                       </td>
                     </motion.tr>
                   ))}
