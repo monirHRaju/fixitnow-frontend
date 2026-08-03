@@ -105,7 +105,7 @@ export default function ServiceDetailPage() {
 
     if (!service) return;
     router.push(
-      `/bookings/new?service=${service.id}&technician=${service.technician.id}`
+      `/bookings/new?serviceId=${service.id}&technicianId=${service.technician.id}`
     );
   };
 
@@ -340,10 +340,10 @@ export default function ServiceDetailPage() {
               Book Now
             </Button>
 
-            {technician && technician.services.length > 1 && (
+            {technician && (technician.services?.length ?? 0) > 1 && (
               <div className="mt-4">
                 <p className="text-xs text-muted-foreground text-center">
-                  This technician offers {technician.services.length} service(s).
+                  This technician offers {technician.services?.length} service(s).
                   <br />
                   <Link
                     href={`/technicians/${service.technician.id}`}

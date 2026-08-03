@@ -345,7 +345,7 @@ export default function TechnicianDetailPage() {
           )}
 
           {/* Services Offered */}
-          {technician.services.length > 0 && (
+          {(technician.services?.length ?? 0) > 0 && (
             <motion.div
               initial="hidden"
               animate="visible"
@@ -354,10 +354,10 @@ export default function TechnicianDetailPage() {
             >
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <Wrench className="h-5 w-5 text-primary" />
-                Services Offered ({technician.services.length})
+                Services Offered ({technician.services?.length ?? 0})
               </h2>
               <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                {technician.services.map((service) => (
+                {(technician.services ?? []).map((service) => (
                   <Link
                     key={service.id}
                     href={`/services/${service.id}`}
@@ -505,13 +505,13 @@ export default function TechnicianDetailPage() {
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Services</span>
                 <span className="font-medium text-foreground">
-                  {technician._count.services}
+                  {technician._count?.services ?? 0}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Total Jobs</span>
                 <span className="font-medium text-foreground">
-                  {technician._count.bookings}
+                  {technician._count?.bookings ?? 0}
                 </span>
               </div>
               <div className="flex items-center justify-between">
