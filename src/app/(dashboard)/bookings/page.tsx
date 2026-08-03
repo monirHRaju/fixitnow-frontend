@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import {
   CalendarCheck,
   Loader2,
-  AlertCircle,
   XCircle,
   DollarSign,
   Star,
@@ -15,6 +14,7 @@ import {
 import { useBookings, useCancelBooking, useCreatePayment } from "@/lib/hooks";
 import type { BookingStatus } from "@/lib/types";
 import { Button } from "@/components/ui/button";
+import { EmptyState, ErrorState, LoadingSkeleton } from "@/components/shared";
 import {
   Card,
   CardContent,
@@ -22,7 +22,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { BookingStatusBadge } from "@/components/booking/BookingStatusBadge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -175,47 +174,24 @@ export default function BookingsPage() {
       {/* Bookings List */}
       <motion.div variants={itemVariants} className="space-y-4">
         {isLoading ? (
-          Array.from({ length: 3 }).map((_, i) => (
-            <Card key={i}>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <Skeleton className="h-12 w-12 rounded-lg" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-4 w-48" />
-                    <Skeleton className="h-3 w-32" />
-                  </div>
-                  <Skeleton className="h-6 w-20 rounded-full" />
-                </div>
-              </CardContent>
-            </Card>
-          ))
+          <LoadingSkeleton layout="list" count={3} />
         ) : error ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <AlertCircle className="h-12 w-12 text-destructive" />
-              <p className="mt-4 text-sm text-muted-foreground">
-                {error.message}
-              </p>
-              <Button variant="outline" className="mt-4" onClick={() => refetch()}>
-                Try Again
-              </Button>
-            </CardContent>
-          </Card>
+          <ErrorState message={error.message} onRetry={() => refetch()} />
         ) : sortedBookings.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <CalendarCheck className="h-16 w-16 text-muted-foreground/30" />
-              <h3 className="mt-4 text-lg font-medium">No bookings found</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {activeTab === "ALL"
-                  ? "You haven't made any bookings yet."
-                  : `No bookings with status "${activeTab}".`}
-              </p>
-              <Button asChild className="mt-6">
+          <EmptyState
+            icon={CalendarCheck}
+            title="No bookings found"
+            description={
+              activeTab === "ALL"
+                ? "You haven't made any bookings yet."
+                : `No bookings with status "${activeTab}".`
+            }
+            action={
+              <Button asChild>
                 <Link href="/bookings/new">Book a Service</Link>
               </Button>
-            </CardContent>
-          </Card>
+            }
+          />
         ) : (
           sortedBookings.map((booking) => (
             <motion.div key={booking.id} layout>

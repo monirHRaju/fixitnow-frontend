@@ -24,8 +24,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import { formatDate, getStatusColor } from "@/lib/utils";
+import { StatusBadge } from "@/components/shared";
+import { formatDate } from "@/lib/utils";
 
 // Animation variants
 const containerVariants = {
@@ -251,9 +251,7 @@ export default function CustomerDashboardPage() {
                           {formatDate(booking.scheduledAt)}
                         </p>
                       </div>
-                      <Badge className={getStatusColor(booking.status)}>
-                        {booking.status}
-                      </Badge>
+                      <StatusBadge status={booking.status} />
                     </Link>
                   ))}
                 </div>

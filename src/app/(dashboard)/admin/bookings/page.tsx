@@ -9,12 +9,10 @@ import type { Booking } from "@/lib/types";
 import {
   formatCurrency,
   formatDateTime,
-  getStatusColor,
 } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState, LoadingSkeleton, PageHeader, StatusBadge } from "@/components/shared";
 import {
   Select,
   SelectContent,
@@ -137,15 +135,7 @@ export default function AdminBookingsPage() {
 
   return (
     <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <h1 className="text-2xl font-bold tracking-tight">Bookings</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          View all bookings across the platform
-        </p>
-      </motion.div>
+      <PageHeader title="Bookings" description="View all bookings across the platform" />
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3">
@@ -170,15 +160,9 @@ export default function AdminBookingsPage() {
       <Card>
         <CardContent className="p-0">
           {loading ? (
-            <div className="space-y-3 p-6">
-              {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-14 w-full" />
-              ))}
-            </div>
+            <LoadingSkeleton count={5} />
           ) : bookings.length === 0 ? (
-            <p className="text-sm text-muted-foreground p-6 text-center">
-              No bookings found
-            </p>
+            <EmptyState compact title="No bookings found" />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -234,22 +218,14 @@ export default function AdminBookingsPage() {
                         {formatCurrency(booking.service.price)}
                       </td>
                       <td className="py-3 px-4">
-                        <Badge className={getStatusColor(booking.status)}>
-                          {booking.status.replace("_", " ")}
-                        </Badge>
+                        <StatusBadge status={booking.status} />
                       </td>
                       <td className="py-3 px-4 text-muted-foreground hidden md:table-cell">
                         {formatDateTime(booking.scheduledAt)}
                       </td>
                       <td className="py-3 px-4 hidden lg:table-cell">
                         {booking.payment ? (
-                          <Badge
-                            className={getStatusColor(
-                              booking.payment.status
-                            )}
-                          >
-                            {booking.payment.status}
-                          </Badge>
+                          <StatusBadge status={booking.payment.status} />
                         ) : (
                           <span className="text-muted-foreground">—</span>
                         )}

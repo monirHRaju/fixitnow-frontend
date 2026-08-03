@@ -17,9 +17,9 @@ import {
 } from "lucide-react";
 import { adminApi } from "@/lib/api";
 import type { DashboardData } from "@/lib/types";
-import { formatCurrency, getStatusColor } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { ErrorState, LoadingSkeleton, PageHeader, StatusBadge } from "@/components/shared";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AdminReportsPage() {
@@ -170,22 +170,9 @@ export default function AdminReportsPage() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h1 className="text-2xl font-bold tracking-tight">Reports</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Platform analytics and summary
-          </p>
+          <PageHeader title="Reports" description="Platform analytics and summary" />
         </motion.div>
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <p className="text-sm text-muted-foreground">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-4 text-sm text-primary underline underline-offset-4 hover:no-underline"
-            >
-              Try Again
-            </button>
-          </CardContent>
-        </Card>
+        <ErrorState message={error} onRetry={() => window.location.reload()} />
       </div>
     );
   }
@@ -196,10 +183,7 @@ export default function AdminReportsPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-2xl font-bold tracking-tight">Reports</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Platform analytics and summary
-        </p>
+        <PageHeader title="Reports" description="Platform analytics and summary" />
       </motion.div>
 
       {/* Stats Grid */}
@@ -316,11 +300,7 @@ export default function AdminReportsPage() {
           </CardHeader>
           <CardContent className="p-0">
             {loading ? (
-              <div className="space-y-3 p-6 pt-0">
-                {[...Array(5)].map((_, i) => (
-                  <Skeleton key={i} className="h-12 w-full" />
-                ))}
-              </div>
+              <LoadingSkeleton count={5} />
             ) : !data?.recentBookings?.length ? (
               <p className="text-sm text-muted-foreground p-6 pt-0 text-center">
                 No recent bookings
@@ -368,9 +348,7 @@ export default function AdminReportsPage() {
                           {booking.technician?.user?.name || "N/A"}
                         </td>
                         <td className="py-3 px-4">
-                          <Badge className={getStatusColor(booking.status)}>
-                            {booking.status.replace("_", " ")}
-                          </Badge>
+                          <StatusBadge status={booking.status} />
                         </td>
                         <td className="py-3 px-4 text-right font-medium">
                           {formatCurrency(booking.service.price)}

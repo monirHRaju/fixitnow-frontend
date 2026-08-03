@@ -13,10 +13,10 @@ import {
 } from "lucide-react";
 import { technicianApi } from "@/lib/api";
 import type { Booking } from "@/lib/types";
-import { formatDateTime, formatCurrency, getStatusColor } from "@/lib/utils";
+import { formatDateTime, formatCurrency } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/shared";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -188,11 +188,7 @@ export default function TechnicianBookingsPage() {
                             <h3 className="font-semibold text-base truncate">
                               {booking.service.title}
                             </h3>
-                            <Badge
-                              className={getStatusColor(booking.status)}
-                            >
-                              {booking.status.replace("_", " ")}
-                            </Badge>
+                            <StatusBadge status={booking.status} />
                           </div>
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-sm text-muted-foreground">

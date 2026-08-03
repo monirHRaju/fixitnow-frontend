@@ -20,9 +20,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/shared";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatDate, getStatusColor, formatCurrency } from "@/lib/utils";
+import { formatDate, formatCurrency } from "@/lib/utils";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -188,8 +188,8 @@ export default function PaymentsPage() {
                       {payment.method || payment.provider || "N/A"}
                     </td>
                     <td className="px-4 py-4">
-                      <Badge
-                        className={getStatusColor(payment.status)}
+                      <StatusBadge
+                        status={payment.status}
                         variant={
                           payment.status === "COMPLETED"
                             ? "default"
@@ -197,9 +197,7 @@ export default function PaymentsPage() {
                             ? "destructive"
                             : "secondary"
                         }
-                      >
-                        {payment.status}
-                      </Badge>
+                      />
                     </td>
                     <td className="px-4 py-4 text-sm text-muted-foreground">
                       {formatDate(payment.createdAt)}

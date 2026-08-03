@@ -42,6 +42,14 @@ export function getStatusColor(status: string): string {
   return colors[status] || "bg-gray-100 text-gray-800";
 }
 
+export function formatLabel(status: string): string {
+  return String(status || "")
+    .toLowerCase()
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 export function getDayName(day: number): string {
   const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   return days[day];

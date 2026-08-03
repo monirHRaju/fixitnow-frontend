@@ -10,11 +10,10 @@ import {
 } from "lucide-react";
 import { paymentApi } from "@/lib/api";
 import type { Payment } from "@/lib/types";
-import { formatCurrency, formatDate, getStatusColor } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingSkeleton, PageHeader, StatusBadge } from "@/components/shared";
 import {
   Select,
   SelectContent,
@@ -107,15 +106,7 @@ export default function AdminPaymentsPage() {
 
   return (
     <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <h1 className="text-2xl font-bold tracking-tight">Payments</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          View all payment transactions across the platform
-        </p>
-      </motion.div>
+      <PageHeader title="Payments" description="View all payment transactions across the platform" />
 
       {/* Filters */}
       <div className="flex items-center gap-3">
@@ -137,11 +128,7 @@ export default function AdminPaymentsPage() {
       <Card>
         <CardContent className="p-0">
           {loading ? (
-            <div className="space-y-3 p-6">
-              {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-14 w-full" />
-              ))}
-            </div>
+            <LoadingSkeleton count={5} />
           ) : error ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <AlertCircle className="h-12 w-12 text-destructive mb-3" />
@@ -223,8 +210,8 @@ export default function AdminPaymentsPage() {
                         {payment.provider || "N/A"}
                       </td>
                       <td className="py-3 px-4">
-                        <Badge
-                          className={getStatusColor(payment.status)}
+                        <StatusBadge
+                          status={payment.status}
                           variant={
                             payment.status === "COMPLETED"
                               ? "default"
@@ -232,9 +219,7 @@ export default function AdminPaymentsPage() {
                               ? "destructive"
                               : "secondary"
                           }
-                        >
-                          {payment.status}
-                        </Badge>
+                        />
                       </td>
                       <td className="py-3 px-4 text-xs text-muted-foreground font-mono hidden lg:table-cell">
                         {payment.transactionId || "—"}

@@ -18,9 +18,9 @@ import {
 } from "lucide-react";
 import { adminApi } from "@/lib/api";
 import type { Booking } from "@/lib/types";
-import { formatCurrency, formatDateTime, getStatusColor, cn } from "@/lib/utils";
+import { formatCurrency, formatDateTime, cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
@@ -157,9 +157,7 @@ export default function AdminBookingDetailPage() {
             Booking #{booking.id.slice(-6).toUpperCase()}
           </h1>
           <div className="flex items-center gap-2 mt-1">
-            <Badge className={getStatusColor(booking.status)}>
-              {booking.status.replace("_", " ")}
-            </Badge>
+            <StatusBadge status={booking.status} />
             <span className="text-sm text-muted-foreground">
               {formatDateTime(booking.scheduledAt)}
             </span>

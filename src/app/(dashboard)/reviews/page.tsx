@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  Star,
   Loader2,
   AlertCircle,
   MessageSquare,
@@ -12,6 +11,7 @@ import {
 } from "lucide-react";
 import { reviewApi } from "@/lib/api";
 import type { Review } from "@/lib/types";
+import { StarRating as StarRatingShared } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -38,23 +38,7 @@ const itemVariants = {
 };
 
 function StarRating({ rating }: { rating: number }) {
-  return (
-    <div className="flex items-center gap-0.5">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star
-          key={i}
-          className={`h-4 w-4 ${
-            i < rating
-              ? "fill-yellow-400 text-yellow-400"
-              : "fill-none text-muted-foreground/30"
-          }`}
-        />
-      ))}
-      <span className="ml-1.5 text-sm text-muted-foreground">
-        ({rating}/5)
-      </span>
-    </div>
-  );
+  return <StarRatingShared rating={rating} size="sm" />;
 }
 
 export default function ReviewsPage() {

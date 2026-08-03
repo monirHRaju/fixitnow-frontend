@@ -12,13 +12,9 @@ import {
 } from "lucide-react";
 import { adminApi } from "@/lib/api";
 import type { DashboardData, Booking } from "@/lib/types";
-import {
-  formatCurrency,
-  formatDateTime,
-  getStatusColor,
-} from "@/lib/utils";
+import { formatCurrency, formatDateTime } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { LoadingSkeleton, PageHeader, StatusBadge } from "@/components/shared";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 
@@ -91,10 +87,7 @@ export default function AdminDashboardPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-2xl font-bold tracking-tight">Admin Dashboard</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Overview of the platform
-        </p>
+        <PageHeader title="Admin Dashboard" description="Overview of the platform" />
       </motion.div>
 
       {/* Stats Grid */}
@@ -144,11 +137,7 @@ export default function AdminDashboardPage() {
           </CardHeader>
           <CardContent className="p-0">
             {loading ? (
-              <div className="space-y-3 p-6 pt-0">
-                {[...Array(5)].map((_, i) => (
-                  <Skeleton key={i} className="h-12 w-full" />
-                ))}
-              </div>
+              <LoadingSkeleton count={5} />
             ) : !data?.recentBookings?.length ? (
               <p className="text-sm text-muted-foreground p-6 pt-0 text-center">
                 No recent bookings
@@ -196,9 +185,7 @@ export default function AdminDashboardPage() {
                           {formatDateTime(booking.scheduledAt)}
                         </td>
                         <td className="py-3 px-4">
-                          <Badge className={getStatusColor(booking.status)}>
-                            {booking.status.replace("_", " ")}
-                          </Badge>
+                          <StatusBadge status={booking.status} />
                         </td>
                         <td className="py-3 px-4 text-right font-medium">
                           {formatCurrency(booking.service.price)}

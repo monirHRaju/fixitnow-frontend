@@ -22,6 +22,8 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { UserAvatar } from "@/components/ui/UserAvatar";
+import { StarRating } from "@/components/shared";
+
 import { technicianApi } from "@/lib/api";
 import { formatCurrency, formatDate, getDayName } from "@/lib/utils";
 import type { TechnicianDetail, Review } from "@/lib/types";
@@ -47,27 +49,7 @@ function StarRatingDisplay({
   rating: number | null;
   size?: "sm" | "md";
 }) {
-  if (!rating)
-    return <span className="text-sm text-muted-foreground">No ratings</span>;
-  const starSize = size === "sm" ? "h-3.5 w-3.5" : "h-5 w-5";
-  const textSize = size === "sm" ? "text-sm" : "text-lg";
-  return (
-    <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          className={`${starSize} ${
-            star <= Math.round(rating)
-              ? "fill-yellow-400 text-yellow-400"
-              : "fill-none text-muted-foreground/30"
-          }`}
-        />
-      ))}
-      <span className={`ml-1.5 font-medium text-foreground ${textSize}`}>
-        {rating.toFixed(1)}
-      </span>
-    </div>
-  );
+  return <StarRating rating={rating} size={size} />;
 }
 
 function SkillBadge({ skill }: { skill: string }) {

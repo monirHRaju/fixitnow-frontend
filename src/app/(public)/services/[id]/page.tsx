@@ -6,7 +6,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
-  Star,
   Clock,
   MapPin,
   Wrench,
@@ -22,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { UserAvatar } from "@/components/ui/UserAvatar";
+import { StarRating } from "@/components/shared";
 import { serviceApi, technicianApi } from "@/lib/api";
 import { formatCurrency } from "@/lib/utils";
 import { useAuthStore } from "@/lib/store";
@@ -34,24 +34,7 @@ const fadeInUp = {
 };
 
 function StarRatingDisplay({ rating }: { rating: number | null }) {
-  if (!rating) return <span className="text-xs text-muted-foreground">No ratings yet</span>;
-  return (
-    <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          className={`h-4 w-4 ${
-            star <= Math.round(rating)
-              ? "fill-yellow-400 text-yellow-400"
-              : "fill-none text-muted-foreground/30"
-          }`}
-        />
-      ))}
-      <span className="ml-1.5 text-sm font-medium text-foreground">
-        {rating.toFixed(1)}
-      </span>
-    </div>
-  );
+  return <StarRating rating={rating} />;
 }
 
 function SkillBadge({ skill }: { skill: string }) {

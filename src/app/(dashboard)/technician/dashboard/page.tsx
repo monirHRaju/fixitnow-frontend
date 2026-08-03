@@ -21,9 +21,9 @@ import {
 import { useAuthStore } from "@/lib/store";
 import { technicianApi } from "@/lib/api";
 import type { Booking } from "@/lib/types";
-import { formatDateTime, formatCurrency, getStatusColor, cn } from "@/lib/utils";
+import { formatDateTime, formatCurrency, cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -501,9 +501,7 @@ export default function TechnicianDashboardPage() {
                                 <span>{formatDateTime(booking.scheduledAt)}</span>
                               </div>
                             </div>
-                            <Badge className={getStatusColor(booking.status)}>
-                              {booking.status.replace("_", " ")}
-                            </Badge>
+                            <StatusBadge status={booking.status} />
                           </motion.div>
                         ))}
                       </div>

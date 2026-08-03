@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
+import { LoadingSkeleton, PageHeader } from "@/components/shared";
 import { toast } from "sonner";
 
 interface PaginationInfo {
@@ -91,15 +91,7 @@ export default function AdminServicesPage() {
 
   return (
     <div className="space-y-6">
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <h1 className="text-2xl font-bold tracking-tight">Services</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          View all services offered by technicians
-        </p>
-      </motion.div>
+      <PageHeader title="Services" description="View all services offered by technicians" />
 
       {/* Search */}
       <div className="flex flex-col sm:flex-row gap-3">
@@ -119,11 +111,7 @@ export default function AdminServicesPage() {
       <Card>
         <CardContent className="p-0">
           {loading ? (
-            <div className="space-y-3 p-6">
-              {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-14 w-full" />
-              ))}
-            </div>
+            <LoadingSkeleton count={5} />
           ) : services.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <Package className="h-12 w-12 text-muted-foreground/40 mb-3" />

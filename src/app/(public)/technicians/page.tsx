@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Search,
-  Star,
   MapPin,
   Wrench,
   LayoutGrid,
@@ -21,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { UserAvatar } from "@/components/ui/UserAvatar";
+import { StarRating } from "@/components/shared";
 import {
   Select,
   SelectContent,
@@ -47,24 +47,7 @@ const staggerContainer = {
 };
 
 function StarRatingDisplay({ rating }: { rating: number | null }) {
-  if (!rating) return <span className="text-xs text-muted-foreground">No ratings</span>;
-  return (
-    <div className="flex items-center gap-0.5">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          className={`h-3.5 w-3.5 ${
-            star <= Math.round(rating)
-              ? "fill-yellow-400 text-yellow-400"
-              : "fill-none text-muted-foreground/30"
-          }`}
-        />
-      ))}
-      <span className="ml-1.5 text-xs font-medium text-foreground">
-        {rating.toFixed(1)}
-      </span>
-    </div>
-  );
+  return <StarRating rating={rating} size="sm" />;
 }
 
 function SkillBadge({ skill }: { skill: string }) {

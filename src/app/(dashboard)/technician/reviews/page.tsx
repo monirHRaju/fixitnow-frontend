@@ -13,6 +13,7 @@ import { useAuthStore } from "@/lib/store";
 import { reviewApi } from "@/lib/api";
 import type { Review, ReviewStats } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
+import { StarRating as StarRatingShared } from "@/components/shared";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -40,21 +41,7 @@ const itemVariants = {
 };
 
 function StarRating({ rating, size = "sm" }: { rating: number; size?: "sm" | "lg" }) {
-  const iconSize = size === "lg" ? "h-5 w-5" : "h-4 w-4";
-  return (
-    <div className="flex items-center gap-0.5">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star
-          key={i}
-          className={`${iconSize} ${
-            i < rating
-              ? "fill-yellow-400 text-yellow-400"
-              : "fill-none text-muted-foreground/30"
-          }`}
-        />
-      ))}
-    </div>
-  );
+  return <StarRatingShared rating={rating} size={size === "lg" ? "md" : "sm"} />;
 }
 
 function getInitials(name: string): string {

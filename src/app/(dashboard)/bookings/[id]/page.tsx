@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { bookingApi, reviewApi } from "@/lib/api";
 import type { Booking } from "@/lib/types";
+import { StarRating } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -450,18 +451,7 @@ export default function BookingDetailPage({
                 <CardContent>
                   {booking.review ? (
                     <div className="space-y-3">
-                      <div className="flex items-center gap-1">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <Star
-                            key={star}
-                            className={`h-5 w-5 ${
-                              star <= booking.review!.rating
-                                ? "fill-yellow-500 text-yellow-500"
-                                : "text-muted-foreground"
-                            }`}
-                          />
-                        ))}
-                      </div>
+                      <StarRating rating={booking.review.rating} size="md" showValue={false} />
                       {booking.review.comment && (
                         <p className="text-sm text-muted-foreground">
                           {booking.review.comment}
